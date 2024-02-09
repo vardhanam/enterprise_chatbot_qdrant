@@ -1,0 +1,7 @@
+torch
+langchain==0.1.4
+acccelerate
+transformers
+crytography
+pypdf
+qdrant-client
