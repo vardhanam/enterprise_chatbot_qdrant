@@ -1,0 +1,25 @@
+credentials:
+  usernames:
+    vardhanam:
+      email: vardhanam@superteams.ai
+      name: Vardhanam Daga
+      password: vardhanam # To be replaced with hashed password
+    soum:
+      email: soum@superteams.ai
+      name: Soum Paul
+      password: soum # To be replaced with hashed password
+    debasri:
+      email: debasri@superteams.ai
+      name: Debasri Rakshit
+      password: debasri # To be replaced with hashed password
+    akriti:
+      email: akriti@superteams.ai
+      name: Akriti Upadhyay
+      password: akriti # To be replaced with hashed password
+cookie:
+  expiry_days: 30
+  key: random_signature_key # Must be string
+  name: random_cookie_name
+preauthorized:
+  emails:
+  - melsby@gmail.com

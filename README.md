@@ -1,42 +1,67 @@
-# Qdrant & Llama-2 Document Processing App
 
-This application leverages the Llama-2 language model for processing documents. It provides a Streamlit-based UI for users to input a folder path containing documents for processing, enter queries, and receive responses based on the processed documents.
+# Legal Documents Processing App with Chatbot
+
+This application combines the power of Large Language Model with the ease of use of Streamlit to offer an innovative solution for interacting with legal documents. Users can upload PDFs of legal documents, which the app processes to create a searchable vector database. Additionally, the app features an interactive chatbot that can answer queries based on the processed documents. This app can be used by enterprises for querying on their internal documents.
 
 ## Features
 
-- **Document Processing**: Load documents from a specified folder and process them using the Llama-2 language model.
-- **Interactive Query System**: Users can submit queries related to the processed documents and receive relevant responses.
-- **Streamlit Integration**: A user-friendly web interface built with Streamlit for easy interaction with the application.
+- **PDF Document Upload:** Users can upload multiple PDF files, which are then processed and stored for querying.
+- **Vector Database:** Utilizes `sentence-transformers/all-mpnet-base-v2` for embeddings and Qdrant for creating a searchable vector database from the uploaded documents.
+- **Interactive Chat:** Powered by the `NousResearch/Llama-2-7b-chat-hf` model, the chatbot provides answers to user queries by referencing the content of the uploaded documents.
+- **User Authentication:** Incorporates a simple authentication system to ensure that only authorized users can access the app.
 
-## Installation
+## Getting Started
 
-To run this application, you need Python 3.6 or later. It's recommended to use a virtual environment.
+### Prerequisites
 
-1. Clone this repository:
+- Python 3.6 or later
+- Pip package manager
+
+### Installation
+
+Clone the repository and install the required dependencies:
+
 ```bash
 git clone https://github.com/vardhanam/enterprise_chatbot_qdrant.git
-```
-
-2. **Navigate to the repository folder:**
-
-After cloning the repository and navigating to the `enterprise_chatbot_qdrant` directory, install the required packages using the following command:
-
-```bash
+cd legal-docs-processing-app
 pip install -r requirements.txt
 ```
 
-3. **Start the Streamlit app:**
+### Running the Application
 
-![Alt text](Screenshot.png)
+To run the app, navigate to the project directory and execute:
 
-4. **Interact with the app:**
-- Open your web browser and go to `http://localhost:8501`.
-- Follow the UI prompts to input a folder path, submit document processing requests, and interact with the processed content through queries.
+```bash
+streamlit run app.py
+```
+
+Replace `app.py` with the path to your Streamlit application script if necessary.
+
+## Usage
+
+Once the application is running, navigate to the provided URL in your web browser:
+
+1. Log in with your credentials. All the credentials are stored in the config.yaml file. If you want to add or remove credentials, you can do so by manipulating the config.yaml file.
+
+
+
+2. Use the "Upload Legal Document PDF files" section to upload your PDF documents.
+
+
+3. Interact with the chatbot through the "What is up?" chat input to query the processed documents.
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions for improving the application or adding new features, please feel free to fork the repository, make your changes, and submit a pull request.
+We welcome contributions to improve the app or extend its capabilities. Please feel free to fork the repository, make your changes, and submit a pull request.
 
-## License
 
-This project is licensed under the [MIT License](LICENSE.md) - see the LICENSE file for details.
+## Acknowledgments
+
+- [Hugging Face](https://huggingface.co/) for the incredible language models and the `transformers` library.
+- [Streamlit](https://streamlit.io/) for the intuitive app development framework.
+- [Qdrant](https://qdrant.tech/) for the vector storage solution.
+
+## Jupyter Notebook
+
+- The repository also contains a Jupyter Notebook by the name app_chatbot.ipynb. You can execute the cells of the notebook in a step by step fashion to launch a gradio app. Don't forget to install the requirements file like before.
+- The gradio app has two tabs. One for uploading new documents. And the other is for querying the documents.

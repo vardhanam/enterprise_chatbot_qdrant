@@ -10,13 +10,51 @@ import torch
 import streamlit as st
 
 from langchain.llms import HuggingFacePipeline
-#funtcion to load the llama2 llm()
+
+import os
+import time  # Just for simulating a delay
+
+from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Qdrant
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+#function to load the llama2 llm()
+
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
+
+UPLOAD_DIR = '/home/vardhanam/enterprise_chatbot/uploaded_pdfs'
+
+def save_uploaded_file(uploaded_file):
+    try:
+        # Create a directory to save the file if it doesn't exist
 
 
+        # Save the file
+        with open(os.path.join(UPLOAD_DIR, uploaded_file.name), 'wb') as f:
+            f.write(uploaded_file.getbuffer())
+
+        return True
+
+    except Exception as e:
+        # If there's an error, print the exception
+        print(e)
+        return False
+
+def generate_response(query):
+     return chain.invoke(query)
+
+
+@st.cache_resource
 def load_llm():
 
     #Loading the Llama-2 Model
-    model_name='NousResearch/Llama-2-7b-chat-hf'
+    model_name='mistralai/Mistral-7B-Instruct-v0.2'
     model_config = transformers.AutoConfig.from_pretrained(
     model_name,
     )
@@ -66,35 +104,19 @@ def load_llm():
     temperature=0.2,
     repetition_penalty=1.1,
     return_full_text=True,
-    max_new_tokens=300,
+    max_new_tokens=1000,
     )
 
     llm = HuggingFacePipeline(pipeline= text_generation_pipeline)
 
     return llm
 
-if 'llm_loaded' not in st.session_state:
-    st.session_state.llm_loaded = False
 
-if 'llm_loaded' in st.session_state and not st.session_state.llm_loaded:
-    with st.spinner('Loading the language model...'):
-        if 'llm' not in st.session_state:
-            st.session_state.llm = load_llm()
-    st.session_state.llm_loaded = True
+@st.cache_resource()
+def process_document(folder_name):
 
-import os
-import time  # Just for simulating a delay
 
-from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Qdrant
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
-
-def process_document(folder_name, llm):
-
+    global text_splitter
     # Simulate some document processing delay
     text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000,
@@ -110,6 +132,7 @@ def process_document(folder_name, llm):
         model_name="sentence-transformers/all-mpnet-base-v2"
     )
 
+    global qdrant_vectorstore
     qdrant_vectorstore = Qdrant.from_documents(
         docs,
         embeddings,
@@ -126,6 +149,7 @@ def process_document(folder_name, llm):
     """
     prompt = ChatPromptTemplate.from_template(template)
 
+    global chain
     chain = (
     {"context": qdrant_retriever, "question": RunnablePassthrough()}
     | prompt
@@ -136,32 +160,84 @@ def process_document(folder_name, llm):
     return chain
 
 
-# Streamlit app starts here
-st.title('Document Processing App')
 
-folder_path = st.text_area("Enter folder path:", max_chars=50, height=5, help="Press the submit button below to submit")
+with st.spinner("Loading llm"):
+    llm = load_llm()
 
-# Button to explicitly submit the input
-if st.button("Submit", key="folder_path_button"):
 
-    if folder_path:
-        if os.path.isdir(folder_path):
-            with st.spinner(f'Processing documents in: {folder_path}...'):
-                st.session_state.chain = process_document(folder_path, st.session_state.llm)
-        else:
-            st.error('Folder not found. Please enter a valid folder name.')
+with st.spinner("Creating Vector DB"):
+    chain = process_document(UPLOAD_DIR)
 
-if 'chat_history' not in st.session_state:
-    st.session_state.chat_history = ''
 
-query = st.text_area("Enter your query here:", max_chars=200, height=5, help="Press the submit button below to submit")
+with open('/home/vardhanam/enterprise_chatbot/config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
 
-if query:
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days'],
+    config['preauthorized']
+)
 
-    if st.button("Submit", key= "query_button"):
-        with st.spinner('Analyzing query...'):
-            response = st.session_state.chain.invoke(query)
-        st.session_state.chat_history += f"> {query}\n{response}\n\n"
+authenticator.login()
 
-    # Display conversation history
-    st.text_area("Conversation:", st.session_state.chat_history, height=1000, key="conversation_area")
+
+if st.session_state["authentication_status"]:
+    authenticator.logout()
+    st.write(f'Welcome *{st.session_state["name"]}*')
+    # Streamlit app starts here
+    st.title('Legal Documents Processing App')
+
+    with st.form("Upload Form", clear_on_submit= True):
+
+        # Use st.file_uploader to upload multiple files
+        uploaded_files = st.file_uploader("Upload Legal Document PDF files:", type='pdf', accept_multiple_files=True)
+
+        submitted = st.form_submit_button("Submit")
+
+        if submitted:
+            # If files were uploaded, iterate over the list of uploaded files
+            if uploaded_files is not None:
+                for uploaded_file in uploaded_files:
+                    # Save each uploaded file to disk
+                    if save_uploaded_file(uploaded_file):
+                        st.success(f"'{uploaded_file.name}' saved successfully!")
+
+                    else:
+                        st.error(f"Failed to save '{uploaded_file.name}'")
+                with st.spinner("Refreshing Vector DB"):
+                    process_document.clear()
+                    chain = process_document(UPLOAD_DIR)
+                    uploaded_files = None
+
+
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Accept user input
+    if prompt := st.chat_input("What would you like to know?"):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        # Display user message in chat message container
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Analyzing Query"):
+                stream = generate_response(prompt)
+                st.markdown(stream)
+
+        st.session_state.messages.append({"role": "assistant", "content": stream})
+
+elif st.session_state["authentication_status"] is False:
+    st.error('Username/password is incorrect')
+
+elif st.session_state["authentication_status"] is None:
+    st.warning('Please enter your username and password')
