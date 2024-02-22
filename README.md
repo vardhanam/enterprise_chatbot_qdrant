@@ -23,7 +23,7 @@ Clone the repository and install the required dependencies:
 
 ```bash
 git clone https://github.com/vardhanam/enterprise_chatbot_qdrant.git
-cd legal-docs-processing-app
+cd enterprise_chatbot
 pip install -r requirements.txt
 ```
 
@@ -43,12 +43,15 @@ Once the application is running, navigate to the provided URL in your web browse
 
 1. Log in with your credentials. All the credentials are stored in the config.yaml file. If you want to add or remove credentials, you can do so by manipulating the config.yaml file.
 
-
+![Alt text](1.png)
 
 2. Use the "Upload Legal Document PDF files" section to upload your PDF documents.
 
+![Alt text](2.png)
 
 3. Interact with the chatbot through the "What is up?" chat input to query the processed documents.
+
+![Alt text](3.png)
 
 ## Contributing
 
