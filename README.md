@@ -1,7 +1,7 @@
 
 # Documents Processing App with Chatbot
 
-This application combines the power of Large Language Model with the ease of use of Streamlit to offer an innovative solution for interacting with legal documents. Users can upload PDFs of legal documents, which the app processes to create a searchable vector database. Additionally, the app features an interactive chatbot that can answer queries based on the processed documents. This app can be used by enterprises for querying on their internal documents.
+This application combines the power of Large Language Model with the ease of use of Streamlit to offer an innovative solution for interacting with legal documents. Users can upload PDFs of legal documents, which the app processes to create a searchable vector database. Additionally, the app features an interactive chatbot that can answer queries based on the processed documents. This app can be used by enterprises for querying on their internal documents..
 
 ## Features
 
