@@ -1,6 +1,6 @@
 torch
 langchain==0.1.4
-acccelerate
+accelerate
 transformers
 crytography
 pypdf

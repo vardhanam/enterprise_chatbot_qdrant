@@ -23,7 +23,7 @@ Clone the repository and install the required dependencies:
 
 ```bash
 git clone https://github.com/vardhanam/enterprise_chatbot_qdrant.git
-cd enterprise_chatbot
+cd enterprise_chatbot_qdrant
 pip install -r requirements.txt
 ```
 
@@ -32,10 +32,10 @@ pip install -r requirements.txt
 To run the app, navigate to the project directory and execute:
 
 ```bash
-streamlit run app.py
+streamlit run app_chatbot.py
 ```
 
-Replace `app.py` with the path to your Streamlit application script if necessary.
+Replace `app_chatbot.py` with the path to your Streamlit application script if necessary.
 
 ## Usage
 
