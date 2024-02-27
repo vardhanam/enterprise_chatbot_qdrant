@@ -2,7 +2,7 @@ torch
 langchain==0.1.4
 accelerate
 transformers
-crytography
+cryptography
 pypdf
 qdrant-client
 streamlit
