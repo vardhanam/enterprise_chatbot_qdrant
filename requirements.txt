@@ -7,3 +7,4 @@ pypdf
 qdrant-client
 streamlit
 streamlit-authenticator
+bitsandbytes
